@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "threadsalive.h"
+#include "list.h"
 
 void thread1(void *arg)
 {

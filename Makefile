@@ -4,9 +4,9 @@ CFLAGS = -g -Wall -fpic
 CPPFLAGS = 
 .PHONY : clean
 
-TESTSRC := $(wildcard test??.c)
-TESTOBJ := $(patsubst %.c,%.o,$(wildcard test??.c))
-TESTPROG := $(patsubst %.c,%,$(wildcard test??.c))
+TESTSRC := $(wildcard test?1.c)
+TESTOBJ := $(patsubst %.c,%.o,$(wildcard test?1.c))
+TESTPROG := $(patsubst %.c,%,$(wildcard test?1.c))
 
 all: libthreadsalive.a $(TESTPROG) ctxtest
 
@@ -18,7 +18,6 @@ ctxtest: ctxtest.o
 
 $(TESTPROG): %: %.o
 	$(CC) -o $@ $(patsubst %.c,%.o,$<) libthreadsalive.a
-
 
 .c.o:
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $<
