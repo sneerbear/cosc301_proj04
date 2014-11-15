@@ -56,11 +56,10 @@ void ta_yield(void) {
 	if(head == NULL){
 		return;
 	}
-	
-	node* old = head;
+
 	nextthread(&head,&tail);
 	
-	if(swapcontext(&old->ctx,&head->ctx) == -1){
+	if(swapcontext(&tail->ctx,&head->ctx) == -1){
 		fprintf(stderr,"WE\'RE GOING DOWN CAPTAIN\n");
 		exit(1);
 	}
@@ -70,9 +69,9 @@ void ta_yield(void) {
 
 int ta_waitall(void) {
 	
-	node *old = head;
+	//node *old = head;
 	
-	while(1){
+	while(head != NULL){
 		
 		if(!head->finished){
 			if(swapcontext(&mainctx, &head->ctx) == -1){
@@ -81,18 +80,11 @@ int ta_waitall(void) {
 			}
 		}
 		
-		head->finished = 1;
-		tail->next = head;
-		tail = head;
+		node* tmp = head;
 		head = head->next;
-		tail->next = NULL;
-		
-		if(head == old){
-			break;
-		}		
+		free(tmp->ctx.uc_stack.ss_sp);
+		free(tmp);
 	}
-	
-	listdestroy(head);
 	
     return 0;
 }
