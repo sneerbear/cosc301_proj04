@@ -4,17 +4,19 @@
 
 #ifndef __THREADSALIVE_H__
 #define __THREADSALIVE_H__
+#include "list.h"
 
 /* ***************************
         type definitions
    *************************** */
 
 typedef struct {
-
+	int count;
+	node *sem_list;
 } tasem_t;
 
 typedef struct {
-
+	tasem_t sem;
 } talock_t;
 
 typedef struct {
