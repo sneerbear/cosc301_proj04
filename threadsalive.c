@@ -19,8 +19,6 @@ ucontext_t mainctx;
 
 void ta_libinit(void) {
 	
-	printf("Library \"initialized\"\n");
-	
     return;
 }
 
@@ -28,6 +26,7 @@ void ta_create(void (*func)(void *), void *arg) {
 	
 	node* thread = malloc(sizeof(node));
 	thread->next = NULL;
+	thread->finished = 0;
 	
 	if(head == NULL){
 		head = thread;
@@ -43,7 +42,6 @@ void ta_create(void (*func)(void *), void *arg) {
     unsigned char *stack = (unsigned char *)malloc(STACKSIZE);
     assert(stack);
 
-    /* initialize thread */
     getcontext(&thread->ctx);
     thread->ctx.uc_stack.ss_sp   = stack;
     thread->ctx.uc_stack.ss_size = STACKSIZE;
@@ -54,28 +52,51 @@ void ta_create(void (*func)(void *), void *arg) {
 }
 
 void ta_yield(void) {
-
+	
+	if(head == NULL){
+		return;
+	}
+	
+	node* old = head;
+	nextthread(&head,&tail);
+	
+	if(swapcontext(&old->ctx,&head->ctx) == -1){
+		fprintf(stderr,"WE\'RE GOING DOWN CAPTAIN\n");
+		exit(1);
+	}
+	
     return;
 }
 
 int ta_waitall(void) {
 	
-	listprint(head);
+	node *old = head;
 	
-	node *runner = head;
-	
-	while(runner != NULL){
-		if(swapcontext(&mainctx, &runner->ctx) == -1){
-			fprintf(stderr,"WE\'RE GOING DOWN CAPTAIN\n");
-			exit(1);
+	while(1){
+		
+		if(!head->finished){
+			if(swapcontext(&mainctx, &head->ctx) == -1){
+				fprintf(stderr,"WE\'RE GOING DOWN CAPTAIN\n");
+				exit(1);
+			}
 		}
-		runner = runner->next;
+		
+		head->finished = 1;
+		tail->next = head;
+		tail = head;
+		head = head->next;
+		tail->next = NULL;
+		
+		if(head == old){
+			break;
+		}		
 	}
 	
 	listdestroy(head);
 	
     return 0;
 }
+
 /* ***************************** 
      stage 2 library functions
    ***************************** *
