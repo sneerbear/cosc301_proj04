@@ -55,21 +55,12 @@ void listprint(node *list) {
 }
 
 void nextthread(node **head, node **tail){
-	node *old = *head;
 	
-	while(1){
-		(**tail).next = *head;
-		*tail = *head;
-		*head = (**head).next;
-		(**tail).next = NULL;
-		if(!(**head).finished || *head == old){
-			if(*head == old){
-				//printf("No Threads Left\n");
-			}
-			break;
-		}
-	}
-	
+	(**tail).next = *head;
+	*tail = *head;
+	*head = (**head).next;
+	(**tail).next = NULL;
+		
 	return;
 }
 

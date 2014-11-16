@@ -94,12 +94,12 @@ int ta_waitall(void) {
    ***************************** */
 void ta_sem_init(tasem_t *sem, int value) {
     sem->count = value;
-    sem->sem_list = malloc(sizeof(struct node));
+    sem->sem_list = malloc(sizeof(node));
 }
 void ta_sem_destroy(tasem_t *sem) {
   while(sem->sem_list->next != NULL){
-	 list_append(&sem->sem_list->ctx, &list);
-	 struct node *temp = sem->sem_list;
+	 //listadd(&sem->sem_list->ctx, &head);
+	 node *temp = sem->sem_list;
 	 sem-> sem_list = sem->sem_list->next;
 	 free(temp);
   }
@@ -116,7 +116,7 @@ void ta_sem_wait(tasem_t *sem) {
 	   sem->count -=1;
 	}
 	if (sem == 0){
-	   swapcontext(&mainctx, &list->ctx);
+	   swapcontext(&mainctx, &head->ctx);
 	}
 }
 void ta_lock_init(talock_t *mutex) {
