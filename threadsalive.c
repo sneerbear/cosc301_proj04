@@ -103,24 +103,16 @@ void ta_sem_destroy(tasem_t *sem) {
 	 free(temp);
   }
   free(sem->count);
-  free(sem);
+  //free(sem);
 }
 void ta_sem_post(tasem_t *sem) {
-	sem->count += 1;
-	if((sem->count <= 0) && (sem->sem_list != NULL)){
-    	ucontext_t *toswap = listremove(&(sem->sem_list));
-    	swapcontext(&mainctx, toswap);
-	}
+	
 }
+
 void ta_sem_wait(tasem_t *sem) {
-	if (sem->count > 0){
-	   sem->count -=1;
-     listappend(&(sem->sem_list),&mainctx);
-	}
-	if (sem == 0){
-	   swapcontext(&mainctx, &(sem->sem_list->ctx));
-	}
+	
 }
+
 void ta_lock_init(talock_t *mutex) {
 	mutex->sem = *(tasem_t*)malloc(sizeof(tasem_t));
 	ta_sem_init(&mutex->sem,1);
