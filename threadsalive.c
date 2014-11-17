@@ -93,30 +93,32 @@ int ta_waitall(void) {
      stage 2 library functions
    ***************************** */
 void ta_sem_init(tasem_t *sem, int value) {
-    sem->count = value;
+    sem->count = malloc(sizeof(int));
     sem->sem_list = malloc(sizeof(node));
 }
 void ta_sem_destroy(tasem_t *sem) {
   while(sem->sem_list->next != NULL){
-	 //listadd(&sem->sem_list->ctx, &head);
 	 node *temp = sem->sem_list;
 	 sem-> sem_list = sem->sem_list->next;
 	 free(temp);
   }
+  free(sem->count);
   free(sem);
 }
 void ta_sem_post(tasem_t *sem) {
 	sem->count += 1;
 	if((sem->count <= 0) && (sem->sem_list != NULL)){
-	   swapcontext(&mainctx, &sem->sem_list->ctx);
+    ucontext_t *toswap = listremove(&(sem->sem_list));
+    swapcontext(&mainctx, toswap);
 	}
 }
 void ta_sem_wait(tasem_t *sem) {
 	if (sem->count > 0){
 	   sem->count -=1;
+     listappend(&(sem->sem_list),&mainctx);
 	}
 	if (sem == 0){
-	   swapcontext(&mainctx, &head->ctx);
+	   swapcontext(&mainctx, &(sem->sem_list->ctx));
 	}
 }
 void ta_lock_init(talock_t *mutex) {
