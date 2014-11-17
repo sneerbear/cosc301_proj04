@@ -24,29 +24,9 @@ void ta_libinit(void) {
 
 void ta_create(void (*func)(void *), void *arg) {
 	
-	node* thread = malloc(sizeof(node));
-	thread->next = NULL;
-	thread->finished = 0;
 	
-	if(head == NULL){
-		head = thread;
-		tail = thread;
-	}
-	
-	else{
-		tail->next = thread;
-		tail = thread;
-	}
-	
-	#define STACKSIZE 128000
-    unsigned char *stack = (unsigned char *)malloc(STACKSIZE);
-    assert(stack);
-
-    getcontext(&thread->ctx);
-    thread->ctx.uc_stack.ss_sp   = stack;
-    thread->ctx.uc_stack.ss_size = STACKSIZE;
-    thread->ctx.uc_link          = &mainctx;
-    makecontext(&thread->ctx, (void (*)(void))func, 1, arg);
+	addctx(&head,&tail,&mainctx);
+    makecontext(&tail->ctx, (void (*)(void))func, 1, arg);
 
     return;
 }
@@ -69,21 +49,14 @@ void ta_yield(void) {
 
 int ta_waitall(void) {
 	
-	//node *old = head;
-	
 	while(head != NULL){
 		
-		if(!head->finished){
-			if(swapcontext(&mainctx, &head->ctx) == -1){
-				fprintf(stderr,"WE\'RE GOING DOWN CAPTAIN\n");
-				exit(1);
-			}
+		if(swapcontext(&mainctx, &head->ctx) == -1){
+			fprintf(stderr,"WE\'RE GOING DOWN CAPTAIN\n");
+			exit(1);
 		}
 		
-		node* tmp = head;
-		head = head->next;
-		free(tmp->ctx.uc_stack.ss_sp);
-		free(tmp);
+		headdestroy(&head);
 	}
 	
     return 0;
