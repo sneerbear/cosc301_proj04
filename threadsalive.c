@@ -93,17 +93,14 @@ int ta_waitall(void) {
      stage 2 library functions
    ***************************** */
 void ta_sem_init(tasem_t *sem, int value) {
-    sem->count = malloc(sizeof(int));
-    sem->sem_list = malloc(sizeof(node));
+	sem->count = malloc(sizeof(int));
+	sem->sem_list = malloc(sizeof(node));
 }
 void ta_sem_destroy(tasem_t *sem) {
-  while(sem->sem_list->next != NULL){
-	 node *temp = sem->sem_list;
-	 sem-> sem_list = sem->sem_list->next;
-	 free(temp);
-  }
-  free(sem->count);
-  //free(sem);
+	
+	listdestroy(sem->list);
+	free(sem->count);
+	
 }
 void ta_sem_post(tasem_t *sem) {
 	
