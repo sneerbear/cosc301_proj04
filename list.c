@@ -4,6 +4,7 @@
 
 /* your list function definitions */
 
+
 // Appends a node containing ucontext_t i to the end of the queue
 // Only used for part 2
 void listappend(node **head, ucontext_t *i) {
@@ -100,14 +101,4 @@ void nextthread(node **head, node **tail){
 		
 	return;
 }
-
-
-
-
-
-
-
-
-
-
 

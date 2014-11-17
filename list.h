@@ -6,7 +6,6 @@
 typedef struct node {
 	ucontext_t ctx;
 	struct node *next;
-	int finished;
 } node;
 
 // Our node class has 3 functions, an add that places an item in
@@ -17,6 +16,7 @@ void addctx(node** head, node** tail, ucontext_t* returnctx);
 void headdestroy(node **head);
 ucontext_t* listremove(node** head);
 void listdestroy(node *head);
+void headdestroy(node **head);
 void listprint(node *head);
 void nextthread(node **head, node **tail);
 
