@@ -53,6 +53,7 @@ ucontext_t *listremove(node **head) {
 
 void listdestroy(node *list) {
 	// Iterate through list and free all nodes
+	printf("ENTERING LIST DESTROY\n");
     while (list != NULL) {
         node *tmp = list;
         list = list->next;
@@ -60,6 +61,7 @@ void listdestroy(node *list) {
 		free(stack);
         free(tmp);
     }
+	printf("LEAVING LIST DESTROY\n");
 }
 
 void listprint(node *list) {

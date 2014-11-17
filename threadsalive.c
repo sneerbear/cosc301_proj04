@@ -60,59 +60,61 @@ int ta_waitall(void) {
 /* ***************************** 
      stage 2 library functions
    ***************************** */
+
 void ta_sem_init(tasem_t *sem, int value) {
+	
 	sem->count = malloc(sizeof(int));
 	sem->head = malloc(sizeof(node));
-	sem->tail = head;
-}
-void ta_sem_destroy(tasem_t *sem) {
-	listdestroy(sem->head);
-	free((sem->count));	
+	sem->head->next = NULL;
+	*(sem->count) = value;
+	sem->tail = sem->head;
+	
 }
 
-void swaphandler(tasem_t *sem) {
-	ucontext_t former;
-	addctx(&(sem->head),&(sem->tail),&former);
-	runordie(swapcontext(&former, listremove(&(sem->head))));
+void ta_sem_destroy(tasem_t *sem) {
+	listdestroy(sem->head);
+	//free((sem->count));	
 }
 
 void ta_sem_post(tasem_t *sem) {
-	sem->count+=1;
+	//printf("IN POST\n");
+	*(sem->count)+=1;
 
-	if(sem->count <= 0 && sem->head != NULL) {
-		swaphandler(sem);
+	if(*(sem->count) <= 0 && sem->head != NULL) {
+		nextthread(&(sem->head),&(sem->tail));
+		runordie(swapcontext(&tail->ctx,&head->ctx));
 	}
 }
 
 void ta_sem_wait(tasem_t *sem) {
-	if(sem->count == 0) {
-		swaphandler(sem);
+	//printf("IN WAIT\n");
+	if(*(sem->count) <= 0 && sem->head != NULL) {
+		nextthread(&(sem->head),&(sem->tail));
+		runordie(swapcontext(&tail->ctx,&head->ctx));
 	}
-	if(sem->count > 0) {
-		sem->count -= 1;
-	}
+	//printf("MIDDLE OF WAIT\n");
+	//if(*(sem->count) > 0) {
+	*(sem->count) -= 1;
+		//}
 }
 
 void ta_lock_init(talock_t *mutex) {
 	mutex->sem = (tasem_t*)malloc(sizeof(tasem_t));
 	ta_sem_init(mutex->sem,1);
 }
+
 void ta_lock_destroy(talock_t *mutex) {
 	ta_sem_destroy((mutex->sem));
-	free(mutex);
+	//free(mutex);
 }
+
 void ta_lock(talock_t *mutex) {
 	ta_sem_wait(mutex->sem);
 }
+
 void ta_unlock(talock_t *mutex) {
 	ta_sem_post(mutex->sem);
 }
-
-
-
-
-
-
 
 
 
