@@ -27,7 +27,10 @@ void listappend(node **head, ucontext_t *i) {
 ucontext_t *listremove(node **head) {
 	node *temp = *head;
 	head = &(temp -> next);
-	return &(temp->ctx);
+	ucontext_t *ret = malloc(sizeof(ucontext_t));
+	ret = &(temp -> ctx);
+	free(temp);
+	return ret;
 }
 
 void listdestroy(node *list) {

@@ -108,8 +108,8 @@ void ta_sem_destroy(tasem_t *sem) {
 void ta_sem_post(tasem_t *sem) {
 	sem->count += 1;
 	if((sem->count <= 0) && (sem->sem_list != NULL)){
-    ucontext_t *toswap = listremove(&(sem->sem_list));
-    swapcontext(&mainctx, toswap);
+    	ucontext_t *toswap = listremove(&(sem->sem_list));
+    	swapcontext(&mainctx, toswap);
 	}
 }
 void ta_sem_wait(tasem_t *sem) {
