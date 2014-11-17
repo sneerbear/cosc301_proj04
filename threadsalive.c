@@ -126,8 +126,8 @@ void ta_lock_init(talock_t *mutex) {
 	ta_sem_init(&mutex->sem,1);
 }
 void ta_lock_destroy(talock_t *mutex) {
-	ta_sem_destroy(&mutex->sem);
-	free(&mutex->sem);
+	ta_sem_destroy(&(mutex->sem));
+	free(mutex);
 }
 void ta_lock(talock_t *mutex) {
 	ta_sem_wait(&mutex->sem);

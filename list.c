@@ -36,6 +36,7 @@ void listdestroy(node *list) {
         node *tmp = list;
         list = list->next;
 		unsigned char *stack = tmp->ctx.uc_stack.ss_sp;
+		printf("%s\n", "Got here");
 		free(stack);
         free(tmp);
     }
