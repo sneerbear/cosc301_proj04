@@ -4,32 +4,20 @@
 
 /* your list function definitions */
 
-void listadd(node **head, ucontext_t i) {
-	
-	//create new node for entry
+void listappend(node **head, ucontext_t *i) {
 	node *n = malloc(sizeof(node));
-	n->ctx = i;
-	//if the list is empty
-	if(*head == NULL){
-		n->next = *head;
-		*head = n;
+	n -> ctx = *i;
+
+	if(head==NULL) {
+		head = &n;
 		return;
 	}
-	
-	//initialize variables for running through the list
-	node *runner = *head;
-	node *previous = *head;
-	runner = runner -> next;
-	
-	//loop through list until the end is reached
-	while(runner != NULL) {
-		previous = runner;
-		runner = runner -> next;
+
+	node *temp = *head;
+	while(temp !=NULL) {
+		temp = temp->next;
 	}
-	
-	//place new node in the proper location
-	previous->next = n;
-	n->next = runner;
+	temp = n;
 }
 
 void addctx(node** head, node** tail, ucontext_t* returnctx){
@@ -58,17 +46,6 @@ void addctx(node** head, node** tail, ucontext_t* returnctx){
 	
 }
 
-void listdestroy(node *list) {
-	// Iterate through list and free all nodes
-    while (list != NULL) {
-        node *tmp = list;
-        list = list->next;
-		unsigned char *stack = tmp->ctx.uc_stack.ss_sp;
-		free(stack);
-        free(tmp);
-    }
-}
-
 void headdestroy(node **head){
 	
 	node* tmp = *head;
@@ -76,6 +53,29 @@ void headdestroy(node **head){
 	free(tmp->ctx.uc_stack.ss_sp);
 	free(tmp);
 	
+}
+
+// Removes and returns the ucontext_t value in the top node of the queue
+// Should never be called if list is empty
+ucontext_t *listremove(node **head) {
+	node *temp = *head;
+	head = &(temp -> next);
+	ucontext_t *ret = malloc(sizeof(ucontext_t));
+	ret = &(temp -> ctx);
+	free(temp);
+	return ret;
+}
+
+void listdestroy(node *list) {
+	// Iterate through list and free all nodes
+    while (list != NULL) {
+        node *tmp = list;
+        list = list->next;
+		unsigned char *stack = tmp->ctx.uc_stack.ss_sp;
+		printf("%s\n", "Got here");
+		free(stack);
+        free(tmp);
+    }
 }
 
 void listprint(node *list) {
@@ -95,21 +95,6 @@ void nextthread(node **head, node **tail){
 	*tail = *head;
 	*head = (**head).next;
 	(**tail).next = NULL;
-	
+		
 	return;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

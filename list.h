@@ -13,6 +13,7 @@ typedef struct node {
 // a list print
 void listadd(node **head, ucontext_t i);
 void addctx(node** head, node** tail, ucontext_t* returnctx);
+ucontext_t *listremove(node **head);
 void listdestroy(node *head);
 void headdestroy(node **head);
 void listprint(node *head);
