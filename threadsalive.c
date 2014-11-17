@@ -73,29 +73,27 @@ void ta_sem_init(tasem_t *sem, int value) {
 
 void ta_sem_destroy(tasem_t *sem) {
 	listdestroy(sem->head);
-	//free((sem->count));	
+	free((sem->count));	
 }
 
 void ta_sem_post(tasem_t *sem) {
-	//printf("IN POST\n");
+
 	*(sem->count)+=1;
 
 	if(*(sem->count) <= 0 && sem->head != NULL) {
 		nextthread(&(sem->head),&(sem->tail));
-		runordie(swapcontext(&tail->ctx,&head->ctx));
+		runordie(swapcontext(&sem->tail->ctx,&sem->head->ctx));
 	}
 }
 
 void ta_sem_wait(tasem_t *sem) {
-	//printf("IN WAIT\n");
+	
 	if(*(sem->count) <= 0 && sem->head != NULL) {
 		nextthread(&(sem->head),&(sem->tail));
-		runordie(swapcontext(&tail->ctx,&head->ctx));
+		runordie(swapcontext(&sem->tail->ctx,&sem->head->ctx));
 	}
-	//printf("MIDDLE OF WAIT\n");
-	//if(*(sem->count) > 0) {
+
 	*(sem->count) -= 1;
-		//}
 }
 
 void ta_lock_init(talock_t *mutex) {
@@ -104,10 +102,8 @@ void ta_lock_init(talock_t *mutex) {
 }
 
 void ta_lock_destroy(talock_t *mutex) {
-
 	ta_sem_destroy(mutex->sem);
-	free(mutex);
-
+	free(mutex->sem);
 }
 
 void ta_lock(talock_t *mutex) {
@@ -117,6 +113,7 @@ void ta_lock(talock_t *mutex) {
 void ta_unlock(talock_t *mutex) {
 	ta_sem_post(mutex->sem);
 }
+
 
 
 
