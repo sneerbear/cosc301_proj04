@@ -22,6 +22,41 @@ void listappend(node **head, ucontext_t *i) {
 	temp = n;
 }
 
+void addctx(node** head, node** tail, ucontext_t* returnctx){
+	
+	node* thread = malloc(sizeof(node));
+	thread->next = NULL;
+	
+	if(*head == NULL){
+		*head = thread;
+		*tail = thread;
+	}
+	
+	else{
+		(**tail).next = thread;
+		*tail = thread;
+	}
+	
+	#define STACKSIZE 128000
+	unsigned char *stack = (unsigned char *)malloc(STACKSIZE);
+	assert(stack);
+
+	getcontext(&thread->ctx);
+	thread->ctx.uc_stack.ss_sp   = stack;
+	thread->ctx.uc_stack.ss_size = STACKSIZE;
+	thread->ctx.uc_link          = returnctx;
+	
+}
+
+void headdestroy(node **head){
+	
+	node* tmp = *head;
+	*head = (**head).next;
+	free(tmp->ctx.uc_stack.ss_sp);
+	free(tmp);
+	
+}
+
 // Removes and returns the ucontext_t value in the top node of the queue
 // Should never be called if list is empty
 ucontext_t *listremove(node **head) {
@@ -65,9 +100,6 @@ void nextthread(node **head, node **tail){
 		
 	return;
 }
-
-
-
 
 
 
