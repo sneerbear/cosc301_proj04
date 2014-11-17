@@ -6,14 +6,15 @@
 typedef struct node {
 	ucontext_t ctx;
 	struct node *next;
-	int finished;
 } node;
 
 // Our node class has 3 functions, an add that places an item in
 // the correct location to keep list sorted, a list destroy, and
 // a list print
 void listadd(node **head, ucontext_t i);
+void addctx(node** head, node** tail, ucontext_t* returnctx);
 void listdestroy(node *head);
+void headdestroy(node **head);
 void listprint(node *head);
 void nextthread(node **head, node **tail);
 
