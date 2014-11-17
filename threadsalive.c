@@ -67,20 +67,38 @@ int ta_waitall(void) {
    ***************************** */
 void ta_sem_init(tasem_t *sem, int value) {
 	sem->count = malloc(sizeof(int));
-	sem->sem_list = malloc(sizeof(node));
+	sem->head = malloc(sizeof(node));
+	sem->tail = head;
 }
 void ta_sem_destroy(tasem_t *sem) {
-	
-	listdestroy(sem->list);
-	free(sem->count);
-	
+	listdestroy(sem->head);
+	free(sem->count);	
 }
+
+void swaphandler(tasem_t *sem) {
+	ucontext_t former;
+	addctx(&(sem->head),&(sem->tail),&former);
+	if(swapcontext(&former, listremove(&(sem->head))) == -1){
+		fprintf(stderr,"WE\'RE GOING DOWN CAPTAIN\n");
+		exit(1);
+	}
+}
+
 void ta_sem_post(tasem_t *sem) {
-	
+	sem->count+=1;
+
+	if(sem->count <= 0 && sem->head != NULL) {
+		swaphandler(sem);
+	}
 }
 
 void ta_sem_wait(tasem_t *sem) {
-	
+	if(sem->count == 0) {
+		swaphandler(sem);
+	}
+	if(sem->count > 0) {
+		sem->count -= 1;
+	}
 }
 
 void ta_lock_init(talock_t *mutex) {

@@ -11,7 +11,6 @@ typedef struct node {
 // Our node class has 3 functions, an add that places an item in
 // the correct location to keep list sorted, a list destroy, and
 // a list print
-void listadd(node **head, ucontext_t i);
 void addctx(node** head, node** tail, ucontext_t* returnctx);
 void headdestroy(node **head);
 ucontext_t* listremove(node** head);

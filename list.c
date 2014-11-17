@@ -5,24 +5,6 @@
 /* your list function definitions */
 
 
-// Appends a node containing ucontext_t i to the end of the queue
-// Only used for part 2
-void listappend(node **head, ucontext_t *i) {
-	node *n = malloc(sizeof(node));
-	n -> ctx = *i;
-
-	if(head==NULL) {
-		head = &n;
-		return;
-	}
-
-	node *temp = *head;
-	while(temp !=NULL) {
-		temp = temp->next;
-	}
-	temp = n;
-}
-
 void addctx(node** head, node** tail, ucontext_t* returnctx){
 	
 	node* thread = malloc(sizeof(node));
@@ -75,7 +57,6 @@ void listdestroy(node *list) {
         node *tmp = list;
         list = list->next;
 		unsigned char *stack = tmp->ctx.uc_stack.ss_sp;
-		printf("%s\n", "Got here");
 		free(stack);
         free(tmp);
     }
