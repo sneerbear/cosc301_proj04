@@ -17,13 +17,17 @@ node *head;
 node *tail;
 ucontext_t mainctx;
 
+#define runordie(value) \
+	if(value == -1){ \
+		fprintf(stderr,"WE\'RE GOING DOWN CAPTAIN\n"); \
+		exit(1);} 
+
 void ta_libinit(void) {
 	
     return;
 }
 
 void ta_create(void (*func)(void *), void *arg) {
-	
 	
 	addctx(&head,&tail,&mainctx);
     makecontext(&tail->ctx, (void (*)(void))func, 1, arg);
@@ -38,11 +42,7 @@ void ta_yield(void) {
 	}
 
 	nextthread(&head,&tail);
-	
-	if(swapcontext(&tail->ctx,&head->ctx) == -1){
-		fprintf(stderr,"WE\'RE GOING DOWN CAPTAIN\n");
-		exit(1);
-	}
+	runordie(swapcontext(&tail->ctx,&head->ctx));
 	
     return;
 }
@@ -50,12 +50,7 @@ void ta_yield(void) {
 int ta_waitall(void) {
 	
 	while(head != NULL){
-		
-		if(swapcontext(&mainctx, &head->ctx) == -1){
-			fprintf(stderr,"WE\'RE GOING DOWN CAPTAIN\n");
-			exit(1);
-		}
-		
+		runordie(swapcontext(&mainctx, &head->ctx))
 		headdestroy(&head);
 	}
 	
@@ -72,16 +67,13 @@ void ta_sem_init(tasem_t *sem, int value) {
 }
 void ta_sem_destroy(tasem_t *sem) {
 	listdestroy(sem->head);
-	free(sem->count);	
+	free((sem->count));	
 }
 
 void swaphandler(tasem_t *sem) {
 	ucontext_t former;
 	addctx(&(sem->head),&(sem->tail),&former);
-	if(swapcontext(&former, listremove(&(sem->head))) == -1){
-		fprintf(stderr,"WE\'RE GOING DOWN CAPTAIN\n");
-		exit(1);
-	}
+	runordie(swapcontext(&former, listremove(&(sem->head))));
 }
 
 void ta_sem_post(tasem_t *sem) {
@@ -102,16 +94,31 @@ void ta_sem_wait(tasem_t *sem) {
 }
 
 void ta_lock_init(talock_t *mutex) {
-	mutex->sem = *(tasem_t*)malloc(sizeof(tasem_t));
-	ta_sem_init(&mutex->sem,1);
+	mutex->sem = (tasem_t*)malloc(sizeof(tasem_t));
+	ta_sem_init(mutex->sem,1);
 }
 void ta_lock_destroy(talock_t *mutex) {
-	ta_sem_destroy(&(mutex->sem));
+	ta_sem_destroy((mutex->sem));
 	free(mutex);
 }
 void ta_lock(talock_t *mutex) {
-	ta_sem_wait(&mutex->sem);
+	ta_sem_wait(mutex->sem);
 }
 void ta_unlock(talock_t *mutex) {
-	ta_sem_post(&mutex->sem);
+	ta_sem_post(mutex->sem);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

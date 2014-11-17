@@ -103,9 +103,13 @@ int main(int argc, char **argv)
     assert(rv == 0);
 
     ta_sem_destroy(&readersem);
+	printf("FINISHED SEM DESTROY\n");
     ta_sem_destroy(&writersem);
+	printf("FINISHED SEM DESTROY\n");
     ta_lock_destroy(&rmutex);
+	printf("FINISHED LOCK DESTROY\n");
     ta_lock_destroy(&wmutex);
+	printf("FINISHED LOCK DESTROY\n");
 
     free(data);
 

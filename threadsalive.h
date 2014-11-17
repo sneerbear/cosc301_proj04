@@ -11,13 +11,13 @@
    *************************** */
 
 typedef struct {
-	int *count;
+	int* count;
 	node *head;
 	node *tail;
 } tasem_t;
 
 typedef struct {
-	tasem_t sem;
+	tasem_t* sem;
 } talock_t;
 
 typedef struct {
