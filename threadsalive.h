@@ -11,7 +11,7 @@
    *************************** */
 
 typedef struct {
-	int* count;
+	int *count;
 	node *head;
 	node *tail;
 } tasem_t;
