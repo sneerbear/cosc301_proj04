@@ -70,8 +70,12 @@ int main(int argc, char **argv)
 
     ta_create(thread1, NULL);
     ta_create(thread2, NULL);
+	
+	printf("BEFORE WAITALL\n");
 
     int rv = ta_waitall();
+	
+	printf("AFTER WAITALL\n");
     assert(rv == 0);
     assert(value == 42);
 

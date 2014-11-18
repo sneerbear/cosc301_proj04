@@ -38,12 +38,12 @@ void headdestroy(node **head){
 	*head = (**head).next;
 	free(tmp->ctx.uc_stack.ss_sp);
 	free(tmp);
-	
 }
 
 // Removes and returns the ucontext_t value in the top node of the queue
 // Should never be called if list is empty
 ucontext_t *listremove(node **head) {
+	
 	node *temp = *head;
 	head = &(temp -> next);
 	ucontext_t *ret = malloc(sizeof(ucontext_t));
@@ -62,13 +62,12 @@ void listdestroy(node *list) {
 		free(stack);
         free(tmp);
     }
-	
 }
 
 //prints the list
 void listprint(node *list) {
+	
 	printf("*** List Contents Begin ***\n");
-	// Iterate through list and print all nodes
 	int i = 0;
     while (list != NULL) {
 		printf("Thread %d\n",i++);
@@ -79,11 +78,11 @@ void listprint(node *list) {
 
 //pops and appends the head
 void nextthread(node **head, node **tail){
-
+	
 	if(*head == NULL){
 		return;
 	}
-
+	
 	if(*tail == NULL){
 		*tail = *head;
 		*head = (**head).next;
@@ -95,7 +94,10 @@ void nextthread(node **head, node **tail){
 	*tail = *head;
 	*head = (**head).next;
 	(**tail).next = NULL;
-		
-	return;
 }
+
+
+
+
+
 

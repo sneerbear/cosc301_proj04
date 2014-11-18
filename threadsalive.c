@@ -44,8 +44,6 @@ void ta_libinit(void) {
 
 	head = NULL;
 	tail = NULL;
-	
-    return;
 }
 
 //Adds a new context to the list and makes context
@@ -53,8 +51,6 @@ void ta_create(void (*func)(void *), void *arg) {
 	
 	addctx(&head,&tail,&mainctx);
     makecontext(&tail->ctx, (void (*)(void))func, 1, arg);
-
-    return;
 }
 
 //Yields to next thread in list
@@ -66,8 +62,6 @@ void ta_yield(void) {
 
 	nextthread(&head,&tail);
 	runordie(swapcontext(&tail->ctx,&head->ctx));
-	
-    return;
 }
 
 //While threads are still running swap to the thread
@@ -94,11 +88,11 @@ void ta_sem_init(tasem_t *sem, int value) {
 	sem->head->next = NULL;
 	*(sem->count) = value;
 	sem->tail = sem->head;
-	
 }
 
 //Free the semaphore
 void ta_sem_destroy(tasem_t *sem) {
+	
 	listdestroy(sem->head);
 	free((sem->count));	
 }
@@ -126,23 +120,27 @@ void ta_sem_wait(tasem_t *sem) {
 
 //Call semaphore with value of one
 void ta_lock_init(talock_t *mutex) {
+	
 	mutex->sem = malloc(sizeof(tasem_t));
 	ta_sem_init(mutex->sem,1);
 }
 
 //Free lock
 void ta_lock_destroy(talock_t *mutex) {
+	
 	ta_sem_destroy(mutex->sem);
 	free(mutex->sem);
 }
 
 //Lock
 void ta_lock(talock_t *mutex) {
+	
 	ta_sem_wait(mutex->sem);
 }
 
 //Unlock
 void ta_unlock(talock_t *mutex) {
+	
 	ta_sem_post(mutex->sem);
 }
 
@@ -152,9 +150,11 @@ void ta_unlock(talock_t *mutex) {
 
 //Initialize list
 void ta_cond_init(tacond_t *cond) {
+	
 	head = NULL;
 	tail = NULL;
-
+	cond->head = NULL;
+	cond->tail = NULL;
 }
 
 void ta_cond_destroy(tacond_t *cond) {
@@ -166,6 +166,7 @@ void ta_wait(talock_t *lock, tacond_t *cond) {
 
 	ta_unlock(lock);
 	nextthread(&(head),&(cond->tail));
+	
 	if(cond->head == NULL){
 		cond->head = cond->tail;
 	}
@@ -178,17 +179,16 @@ void ta_wait(talock_t *lock, tacond_t *cond) {
 }
 
 void ta_signal(tacond_t *cond) {
-
+	
 	if(cond->head !=NULL) {
-
 		nextthread(&(cond->head),&(tail));
-
-		if(cond->head == NULL){
-			cond->tail = cond->head;
-		}
-
+	}
+	if(cond->head == NULL){
+		cond->tail = cond->head;
 	}
 }
+
+
 
 
 
