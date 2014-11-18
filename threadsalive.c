@@ -104,8 +104,8 @@ void ta_sem_post(tasem_t *sem) {
 	*(sem->count)+=1;
 
 	if(*(sem->count) <= 0 && sem->head != NULL) {
-		nextthread(&(sem->head),&(sem->tail));
-		runordie(swapcontext(&sem->tail->ctx,&sem->head->ctx));
+		nextthread(&(head),&(tail));
+		runordie(swapcontext(&(tail->ctx),&(sem->head->ctx)));
 	}
 }
 
@@ -113,8 +113,8 @@ void ta_sem_post(tasem_t *sem) {
 void ta_sem_wait(tasem_t *sem) {
 	
 	if(*(sem->count) <= 0 && sem->head != NULL) {
-		nextthread(&(sem->head),&(sem->tail));
-		runordie(swapcontext(&sem->tail->ctx,&sem->head->ctx));
+		nextthread(&(head),&(sem->tail));
+		runordie(swapcontext(&sem->tail->ctx,&(head->ctx)));
 	}
 
 	*(sem->count) -= 1;
@@ -147,21 +147,22 @@ void ta_unlock(talock_t *mutex) {
    ***************************** */
 
 void ta_cond_init(tacond_t *cond) {
-
+	ta_sem_init(cond->sem,0);
 }
 
 void ta_cond_destroy(tacond_t *cond) {
-
+	ta_sem_destroy(cond->sem);
 }
 
 void ta_wait(talock_t *lock, tacond_t *cond) {
-
+	ta_unlock(lock);
+	ta_sem_wait(cond->sem);
+	ta_lock(lock);
 }
 
 void ta_signal(tacond_t *cond) {
-
+	ta_sem_post(cond->sem);
 }
-
 
 
 
