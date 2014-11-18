@@ -18,7 +18,7 @@
  * Mike attempted Stage 2 and Jack fixed all the seg faults
  * and cleaned up the code to use already defined functions
  *
- * Mike also attempted Stage 3.
+ * Stage three was a triumph of human endeavor.
  *
  * Jack wrote who was responsible for what.
  *
