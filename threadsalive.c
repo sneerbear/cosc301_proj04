@@ -31,6 +31,7 @@
 node *head;
 node *tail;
 ucontext_t mainctx;
+int blocked = 0;
 
 //runordie error checks swapcontext
 #define runordie(value) \
@@ -72,6 +73,10 @@ int ta_waitall(void) {
 		runordie(swapcontext(&mainctx, &head->ctx))
 		headdestroy(&head);
 	}
+
+	if(blocked > 0) {
+		return -1;
+	}
 	
     return 0;
 }
@@ -104,6 +109,7 @@ void ta_sem_post(tasem_t *sem) {
 
 	if(*(sem->count) <= 0 && sem->head != NULL) {
 		nextthread(&(sem->head),&(sem->tail));
+		blocked--;
 		runordie(swapcontext(&sem->tail->ctx,&sem->head->ctx));
 	}
 }
@@ -113,6 +119,7 @@ void ta_sem_wait(tasem_t *sem) {
 	
 	if(*(sem->count) <= 0 && sem->head != NULL) {
 		nextthread(&(sem->head),&(sem->tail));
+		blocked++;
 		runordie(swapcontext(&sem->tail->ctx,&sem->head->ctx));
 	}
 	*(sem->count) -= 1;
@@ -166,6 +173,7 @@ void ta_wait(talock_t *lock, tacond_t *cond) {
 
 	ta_unlock(lock);
 	nextthread(&(head),&(cond->tail));
+	blocked++;
 	
 	if(cond->head == NULL){
 		cond->head = cond->tail;
@@ -182,6 +190,7 @@ void ta_signal(tacond_t *cond) {
 	
 	if(cond->head !=NULL) {
 		nextthread(&(cond->head),&(tail));
+		blocked--;
 	}
 	if(cond->head == NULL){
 		cond->tail = cond->head;
