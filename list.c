@@ -4,7 +4,7 @@
 
 /* your list function definitions */
 
-
+//creates a new context and adds it to the end of the list
 void addctx(node** head, node** tail, ucontext_t* returnctx){
 	
 	node* thread = malloc(sizeof(node));
@@ -31,6 +31,7 @@ void addctx(node** head, node** tail, ucontext_t* returnctx){
 	
 }
 
+//removes the head of the list and frees it
 void headdestroy(node **head){
 	
 	node* tmp = *head;
@@ -51,9 +52,9 @@ ucontext_t *listremove(node **head) {
 	return ret;
 }
 
+//frees everything in the list
 void listdestroy(node *list) {
-	// Iterate through list and free all nodes
-	//printf("ENTERING LIST DESTROY\n");
+
     while (list != NULL) {
         node *tmp = list;
         list = list->next;
@@ -61,9 +62,10 @@ void listdestroy(node *list) {
 		free(stack);
         free(tmp);
     }
-	//printf("LEAVING LIST DESTROY\n");
+	
 }
 
+//prints the list
 void listprint(node *list) {
 	printf("*** List Contents Begin ***\n");
 	// Iterate through list and print all nodes
@@ -75,6 +77,7 @@ void listprint(node *list) {
 	printf("*** List Contents End ***\n");
 }
 
+//pops and appends the head
 void nextthread(node **head, node **tail){
 	
 	(**tail).next = *head;

@@ -9,6 +9,20 @@
 #include "list.c"
 #include "list.h"
 
+/*
+ * Jack Sneeringer and Michael Lese
+ *
+ * Jack did all of Stage 1.
+ *
+ * Mike attempted Stage 2 and Jack fixed all the seg faults
+ * and cleaned up the code to use already defined functions
+ *
+ * Mike also attempted Stage 3.
+ *
+ * Jack wrote who was responsible for what.
+ *
+*/
+
 /* ***************************** 
      stage 1 library functions
    ***************************** */
@@ -17,16 +31,19 @@ node *head;
 node *tail;
 ucontext_t mainctx;
 
+//runordie error checks swapcontext
 #define runordie(value) \
 	if(value == -1){ \
 		fprintf(stderr,"WE\'RE GOING DOWN CAPTAIN\n"); \
 		exit(1);} 
 
+//This doesn't actually do anything?
 void ta_libinit(void) {
 	
     return;
 }
 
+//Adds a new context to the list and makes context
 void ta_create(void (*func)(void *), void *arg) {
 	
 	addctx(&head,&tail,&mainctx);
@@ -35,6 +52,7 @@ void ta_create(void (*func)(void *), void *arg) {
     return;
 }
 
+//Yields to next thread in list
 void ta_yield(void) {
 	
 	if(head == NULL){
@@ -47,6 +65,8 @@ void ta_yield(void) {
     return;
 }
 
+//While threads are still running swap to the thread
+//and then destroy on completion
 int ta_waitall(void) {
 	
 	while(head != NULL){
@@ -61,6 +81,7 @@ int ta_waitall(void) {
      stage 2 library functions
    ***************************** */
 
+//Initialize the semaphore
 void ta_sem_init(tasem_t *sem, int value) {
 	
 	sem->count = malloc(sizeof(int));
@@ -71,11 +92,13 @@ void ta_sem_init(tasem_t *sem, int value) {
 	
 }
 
+//Free the semaphore
 void ta_sem_destroy(tasem_t *sem) {
 	listdestroy(sem->head);
 	free((sem->count));	
 }
 
+//Standard semaphore post without locks
 void ta_sem_post(tasem_t *sem) {
 
 	*(sem->count)+=1;
@@ -86,6 +109,7 @@ void ta_sem_post(tasem_t *sem) {
 	}
 }
 
+//Standard semaphore wait without locks
 void ta_sem_wait(tasem_t *sem) {
 	
 	if(*(sem->count) <= 0 && sem->head != NULL) {
@@ -96,23 +120,31 @@ void ta_sem_wait(tasem_t *sem) {
 	*(sem->count) -= 1;
 }
 
+//Call semaphore with value of one
 void ta_lock_init(talock_t *mutex) {
 	mutex->sem = malloc(sizeof(tasem_t));
 	ta_sem_init(mutex->sem,1);
 }
 
+//Free lock
 void ta_lock_destroy(talock_t *mutex) {
 	ta_sem_destroy(mutex->sem);
 	free(mutex->sem);
 }
 
+//Lock
 void ta_lock(talock_t *mutex) {
 	ta_sem_wait(mutex->sem);
 }
 
+//Unlock
 void ta_unlock(talock_t *mutex) {
 	ta_sem_post(mutex->sem);
 }
+
+/* ***************************** 
+     stage 3 library functions
+   ***************************** */
 
 void ta_cond_init(tacond_t *cond) {
 
