@@ -21,7 +21,7 @@ typedef struct {
 } talock_t;
 
 typedef struct {
-
+	
 } tacond_t;
 
 

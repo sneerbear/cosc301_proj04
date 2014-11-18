@@ -114,7 +114,21 @@ void ta_unlock(talock_t *mutex) {
 	ta_sem_post(mutex->sem);
 }
 
+void ta_cond_init(tacond_t *cond) {
 
+}
+
+void ta_cond_destroy(tacond_t *cond) {
+
+}
+
+void ta_wait(talock_t *lock, tacond_t *cond) {
+
+}
+
+void ta_signal(tacond_t *cond) {
+
+}
 
 
 
