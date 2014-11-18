@@ -21,7 +21,9 @@ typedef struct {
 } talock_t;
 
 typedef struct {
-	tasem_t *sem;
+	//tasem_t *sem;
+	node *head;
+	node *tail;
 } tacond_t;
 
 

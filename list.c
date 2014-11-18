@@ -79,6 +79,17 @@ void listprint(node *list) {
 
 //pops and appends the head
 void nextthread(node **head, node **tail){
+
+	if(*head == NULL){
+		return;
+	}
+
+	if(*tail == NULL){
+		*tail = *head;
+		*head = (**head).next;
+		(**tail).next = NULL;
+		return;
+	}
 	
 	(**tail).next = *head;
 	*tail = *head;

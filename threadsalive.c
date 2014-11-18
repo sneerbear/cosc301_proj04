@@ -39,8 +39,11 @@ ucontext_t mainctx;
 		printf("%s\n", strerror(errno)); \
 		exit(1);} 
 
-//This doesn't actually do anything?
+//Initialize thread list
 void ta_libinit(void) {
+
+	head = NULL;
+	tail = NULL;
 	
     return;
 }
@@ -147,24 +150,44 @@ void ta_unlock(talock_t *mutex) {
      stage 3 library functions
    ***************************** */
 
+//Initialize list
 void ta_cond_init(tacond_t *cond) {
-	cond->sem = malloc(sizeof(tasem_t));
-	ta_sem_init(cond->sem,0);
+	head = NULL;
+	tail = NULL;
 
 }
 
 void ta_cond_destroy(tacond_t *cond) {
-	ta_sem_destroy(cond->sem);
+
+	listdestroy(cond->head);
 }
 
 void ta_wait(talock_t *lock, tacond_t *cond) {
+
 	ta_unlock(lock);
-	ta_sem_wait(cond->sem);
+	nextthread(&(head),&(cond->tail));
+	if(cond->head == NULL){
+		cond->head = cond->tail;
+	}
+	if(head == NULL){
+		tail = head;
+	}
+
+	runordie(swapcontext(&(cond->tail->ctx),&(head->ctx)));
 	ta_lock(lock);
 }
 
 void ta_signal(tacond_t *cond) {
-	ta_sem_post(cond->sem);
+
+	if(cond->head !=NULL) {
+
+		nextthread(&(cond->head),&(tail));
+
+		if(cond->head == NULL){
+			cond->tail = cond->head;
+		}
+
+	}
 }
 
 
