@@ -106,19 +106,17 @@ void ta_sem_post(tasem_t *sem) {
 	*(sem->count)+=1;
 
 	if(*(sem->count) <= 0 && sem->head != NULL) {
-		nextthread(&(head),&(tail));
-		runordie(swapcontext(&(tail->ctx),&(sem->head->ctx)));
+		nextthread(&(sem->head),&(sem->tail));
+		runordie(swapcontext(&sem->tail->ctx,&sem->head->ctx));
 	}
 }
 
 //Standard semaphore wait without locks
 void ta_sem_wait(tasem_t *sem) {
-	if(*(sem->count) <= 0 && head != NULL) {
-		//printf("%d\n",head==NULL);
-		//listprint(head);
-		nextthread(&(head),&(sem->tail));
-		// printf("%d----%d\n",&(sem->tail->ctx),&(head->ctx));
-		runordie(swapcontext(&(sem->tail->ctx),&(head->ctx)));
+	
+	if(*(sem->count) <= 0 && sem->head != NULL) {
+		nextthread(&(sem->head),&(sem->tail));
+		runordie(swapcontext(&sem->tail->ctx,&sem->head->ctx));
 	}
 	*(sem->count) -= 1;
 }
@@ -152,6 +150,7 @@ void ta_unlock(talock_t *mutex) {
 void ta_cond_init(tacond_t *cond) {
 	cond->sem = malloc(sizeof(tasem_t));
 	ta_sem_init(cond->sem,0);
+
 }
 
 void ta_cond_destroy(tacond_t *cond) {
@@ -160,7 +159,6 @@ void ta_cond_destroy(tacond_t *cond) {
 
 void ta_wait(talock_t *lock, tacond_t *cond) {
 	ta_unlock(lock);
-	listprint(head);
 	ta_sem_wait(cond->sem);
 	ta_lock(lock);
 }
@@ -168,6 +166,7 @@ void ta_wait(talock_t *lock, tacond_t *cond) {
 void ta_signal(tacond_t *cond) {
 	ta_sem_post(cond->sem);
 }
+
 
 
 
